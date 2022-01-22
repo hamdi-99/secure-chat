@@ -13,7 +13,7 @@ def encryptor_cli():
         print(f'encrypted message :{encrypt_elgamal(message, elgamal_public)} ')
         print('gamal')
     elif choice_algo == 'b':
-        print(f'encrypted message :{encrypt_rsa(message)} ')
+        print(f'encrypted message :{encrypt_rsa(message, rsa_public)} ')
         print('rsa')
 
 
@@ -24,7 +24,7 @@ def decryptor_cli():
         print(f'decrypted message :{decrypt_elgamal(message, elgamal_private)} ')
         print('gamal')
     elif choice_algo == 'b':
-        print(f'encrypted message :{decrypt_rsa(message)} ')
+        print(f'encrypted message :{decrypt_rsa(message, rsa_private)} ')
         print('rsa')
 
 

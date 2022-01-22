@@ -5,11 +5,6 @@ key_des = '12345678'
 key_aes = '1234567890123456'
 
 
-def pad(text: str, modulo: int):
-    n = len(text) % modulo
-    return text.encode() + (b" " * (modulo - n))
-
-
 def encryptor_sym_cli():
     message = input('entrer un message:\n')
     choice_algo = input('choisissez un algorithme : \n')
@@ -17,45 +12,59 @@ def encryptor_sym_cli():
         print(f'encrypted message :{encrypt_des(key_des, message)} ')
         print('des')
     elif choice_algo == 'b':
-        print(f'encrypted message :{encrypt_aes256(key_aes, message)} ')
+        print(f'encrypted message :{encrypt_aes(key_aes, message)} ')
         print('aes')
 
 
 def decryptor_sym_cli():
-    message = input('entrer un message:\n')
+    message = input('entrer un message:')
     choice_algo = input('choisissez un algorithme : \n')
     if choice_algo == 'a':
         print(f'decrypted message :{decrypt_des(key_des, message)} ')
         print('des')
     elif choice_algo == 'b':
-        print(f'encrypted message :{decrypt_aes256(key_aes, message)} ')
+        print(f'encrypted message :{decrypt_aes(key_aes, message)} ')
         print('aes')
 
 
+def pad(text):
+    n = len(text) % 8
+    return text + (' ' * (8 - n))
+
+
 def encrypt_des(key, message):
-    des = DES.new(key.encode(), DES.MODE_ECB)
-    padded_text = pad(message, 8)
-    encrypted_text: bytes = des.encrypt(padded_text)
-    return encrypted_text
+    des = DES.new(key, DES.MODE_ECB)
+    padded_text = pad(message)
+    encrypted_text = des.encrypt(padded_text)
+    return base64.b64encode(encrypted_text).decode('utf-8')
 
 
-def encrypt_aes256(key, message):
-    padded_text = pad(message, 16)
-    cipher = AES.new(key.encode(), AES.MODE_ECB)
-    cipher_text: bytes = cipher.encrypt(padded_text)
-    return base64.b64encode(cipher.encrypt(padded_text))
+def decrypt_des(key, cipher):
+    des = DES.new(key, DES.MODE_ECB)
+    message = base64.b64decode(cipher)
+    decryptedMsg = des.decrypt(message)
+    return decryptedMsg.decode("utf-8").strip()
 
 
-def decrypt_des(key, message):
-    des = DES.new(key.encode(), DES.MODE_ECB)
-    decrypted_text: bytes = des.decrypt(bytes.fromhex(message))
-    result = decrypted_text.decode("utf-8").strip()
-    return result
+c = encrypt_des('12345678', 'hamza')
+print(c)
+print(decrypt_des('12345678', c))
 
 
-def decrypt_aes256(key, message):
-    cipher = AES.new(key.encode(), AES.MODE_ECB)
-    enc = base64.b64decode(message)
-    ciphertext: bytes = cipher.decrypt(bytes.fromhex(message))
-    result = ciphertext.decode("utf-8").strip()
-    return result
+def pad_16(text):
+    n = len(text) % 16
+    return text + (' ' * (16 - n))
+
+
+def encrypt_aes(key, message):
+    obj = AES.new(key, AES.MODE_CBC, 'This is an IV456')
+    message = pad_16(message)
+    ciphertext = obj.encrypt(message)
+    return base64.b64encode(ciphertext).decode('utf-8')
+
+
+def decrypt_aes(key, cipher):
+    obj = AES.new(key, AES.MODE_CBC, 'This is an IV456')
+    message = base64.b64decode(cipher)
+    decrypted_message = obj.decrypt(message)
+    return decrypted_message.decode("utf-8").strip()
